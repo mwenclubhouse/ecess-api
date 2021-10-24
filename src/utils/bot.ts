@@ -49,11 +49,12 @@ export class Bot {
             for (let k of messages) {
                 const m: Message = k[1];
                 const name = await guild.members.fetch(m.author.id);
+                console.log(-1 != ["Giselle"].indexOf(name.displayName));
                 response.push({
                     author: name.displayName,
                     content: m.content,
                     date: m.editedAt || m.createdAt,
-                    label: name.displayName in ["Giselle", "Leigh Ann"] ? "Advisor": (name.displayName === "Sara Hui" ? "Head Ambassador": "Ambassador")
+                    label: -1 != ["Giselle", "Leigh Ann"].indexOf(name.displayName) ? "Advisor": (name.displayName === "Sara Hui" ? "Head Ambassador": "Ambassador")
                 });
             }
         }
