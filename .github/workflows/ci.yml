@@ -1,0 +1,26 @@
+name: Put Code From GitHub Repo into SHAY
+on: 
+        push:
+                branches:
+                        main
+
+jobs:
+
+        build:
+                name: Connect
+                runs-on: ubuntu-latest
+                steps:
+                        - name: executing remote ssh commands with password
+                          uses: appleboy/ssh-action@master
+                          with:
+                                  host: ${{ secrets.HOST }}
+                                  username: ${{ secrets.USERNAME }}
+                                  key: ${{ secrets.KEY }}
+                                  port: ${{ secrets.PORT }}
+                                  script: |
+                                        cd ecea-api-source-code
+                                        git fetch origin && git reset --hard origin/main
+                                        npm install --production
+                                        npm run build
+                                        cd ../
+                                        pm2 restart ecea-api-source-code

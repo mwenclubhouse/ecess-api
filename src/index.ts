@@ -8,7 +8,7 @@ import * as stream from "stream";
 
 Api.setUse(
     (req: any, res: any, next: any) => {
-        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Origin", "https://www.purdue-ecess.org/");
         return next();
     }
 )
