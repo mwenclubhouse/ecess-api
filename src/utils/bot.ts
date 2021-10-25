@@ -8,6 +8,9 @@ import {
     NewsChannel,
     PartialMessage,
 } from "discord.js";
+import {config} from "dotenv";
+
+config();
 
 export class Bot {
 
