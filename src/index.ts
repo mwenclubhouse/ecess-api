@@ -25,6 +25,7 @@ Api.setGetRoute("/calendar/:org/:cal", async (req: Request, res: Response) => {
     const day = req.query.day;
     const org = req.params.org;
     const cal = req.params.cal;
+    console.log(day, org);
     let error = true;
     if (org === "ambassadors") {
         if (typeof day === "string" || day == undefined) {

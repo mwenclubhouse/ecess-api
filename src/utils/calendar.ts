@@ -17,7 +17,7 @@ export class Calendar {
             SCOPE,
         )
         this.api = google.calendar({version: "v3", auth: auth});
-        this.calendarId = "bg4e1frm2kqlieki1q1tr5j1kg@group.calendar.google.com";
+        this.calendarId = "1t1ggg1uamf194kmrgftse1nk8@group.calendar.google.com";
     }
 
     static async getCalendarEvents(date: undefined | string=undefined) {
