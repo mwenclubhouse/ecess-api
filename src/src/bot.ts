@@ -102,7 +102,8 @@ export class Bot {
         }
     }
 
-    async discordCalendar(date: string | undefined) {
+    async discordCalendar(date: string | undefined, ignore=undefined) {
+        const start_date: Moment  = (date) ? moment(date).startOf('day') : moment().add(1, "days").startOf('day');
         const end_date: Moment | undefined = (date) ?
             moment(date).endOf('day'):
             undefined;
@@ -134,7 +135,9 @@ export class Bot {
                 moment()
                     .add(1, "days")
                     .startOf('day');
-            if (end_date === undefined || event_start < end_date) {
+            if (end_date === undefined ||
+                (start_date.unix() <= event_start.unix() && event_start.unix() <= end_date.unix())
+            ) {
                 parsed_events.push({
                     title: item.name,
                     start: {

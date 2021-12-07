@@ -20,7 +20,7 @@ export class Calendar {
         this.calendarId = "1t1ggg1uamf194kmrgftse1nk8@group.calendar.google.com";
     }
 
-    static async getCalendarEvents(date: undefined | string=undefined): Promise<any[]> {
+    static async getCalendarEvents(date: undefined | string=undefined, ignore=undefined): Promise<any[]> {
         const start_date: Moment  = (date) ? moment(date).startOf('day') : moment().add(1, "days").startOf('day');
         const end_date: Moment | undefined = (date) ? moment(date).endOf('day'): undefined;
         const params: any = {
