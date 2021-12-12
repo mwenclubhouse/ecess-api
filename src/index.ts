@@ -1,10 +1,11 @@
 import {Request, Response} from "express";
-import {Bot} from "./src/bot";
+import {Bot} from "./utils/bot";
 import {Message} from "discord.js";
-import {Api} from "./src/api";
-import {Calendar} from "./src/calendar";
+import {Api} from "./utils/api";
+import {Calendar} from "./utils/calendar";
 import * as stream from "stream";
 import moment from "moment/moment";
+import {MyFbStorage} from "./myFb/myFbStorage";
 
 
 Api.setUse(
@@ -14,12 +15,30 @@ Api.setUse(
     }
 )
 
+
 Api.setGetRoute("/", (req: any, res: any) => {
     res.send({
         status: 'development',
-        purpose: 'ECE Ambassadors',
+        purpose: 'ECE Student Society',
         owner: 'Purdue ECE'
     });
+});
+
+Api.setGetRoute("/bucket", async (req: any, res: any) => {
+    const storage = MyFbStorage.loadStorage();
+    const image = req.query.images;
+    if (typeof image === "string") {
+        const link = await storage.getFileLink(image) ;
+        res.send({
+            image: link
+        })
+    }
+    else {
+        res.send({
+            image: undefined,
+            error: "An Error Occurred"
+        })
+    }
 });
 
 Api.setGetRoute("/calendar/:org/:cal", async (req: Request, res: Response) => {
