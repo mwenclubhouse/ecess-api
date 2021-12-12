@@ -26,7 +26,7 @@ Api.setGetRoute("/", (req: any, res: any) => {
 
 Api.setGetRoute("/bucket", async (req: any, res: any) => {
     const storage = MyFbStorage.loadStorage();
-    const image = req.query.images;
+    const image = req.query.image;
     if (typeof image === "string") {
         const link = await storage.getFileLink(image) ;
         res.send({
