@@ -31,7 +31,7 @@ Api.setGetRoute("/bucket", async (req: any, res: any) => {
     if (typeof image === "string") {
         // const link = await storage.getFileLink(image) ;
         res.send({
-            image: `https://ecess-api.matthewwen.com/blob/path=${image}`
+            image: `https://ecess-api.matthewwen.com/blob?path=${image}`
         })
     }
     else {
