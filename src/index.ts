@@ -6,6 +6,7 @@ import {Calendar} from "./utils/calendar";
 import * as stream from "stream";
 import moment from "moment/moment";
 import {MyFbStorage} from "./myFb/myFbStorage";
+import fs from "fs";
 
 
 Api.setUse(
@@ -25,12 +26,12 @@ Api.setGetRoute("/", (req: any, res: any) => {
 });
 
 Api.setGetRoute("/bucket", async (req: any, res: any) => {
-    const storage = MyFbStorage.loadStorage();
+    // const storage = MyFbStorage.loadStorage();
     const image = req.query.image;
     if (typeof image === "string") {
-        const link = await storage.getFileLink(image) ;
+        // const link = await storage.getFileLink(image) ;
         res.send({
-            image: link
+            image: `https://ecess-api.matthewwen.com/blob/path=${image}`
         })
     }
     else {
@@ -40,6 +41,20 @@ Api.setGetRoute("/bucket", async (req: any, res: any) => {
         })
     }
 });
+
+Api.setGetRoute("/blob", async (req: any, res: any) => {
+    const path = req.query.path;
+    const r = fs.createReadStream(process.env.BUCKET_PATH + "/" + path)
+    const ps = new stream.PassThrough()
+    stream.pipeline(r, ps,
+        (err: any) => {
+            if (err) {
+                console.log(err)
+                return res.sendStatus(400);
+            }
+        })
+    ps.pipe(res)
+})
 
 Api.setGetRoute("/calendar/:org/:cal", async (req: Request, res: Response) => {
     const day = req.query.day;
