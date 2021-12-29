@@ -20,5 +20,5 @@ gcloud iam workload-identity-pools providers create-oidc "gh-to-vm-provider" \
 gcloud iam service-accounts add-iam-policy-binding "gh-actions-to-vm@mwenclubhouse.iam.gserviceaccount.com" \
   --project="mwenclubhouse" \
   --role="roles/iam.workloadIdentityUser" \
-  --member="principalSet://iam.googleapis.com/projects/284911242659/locations/global/workloadIdentityPools/gh-to-vm-pool/*"
+  --member="principalSet://iam.googleapis.com/projects/284911242659/locations/global/workloadIdentityPools/gh-to-vm-pool/attribute.repository/Purdue-ECESS/ecess-api"
 
