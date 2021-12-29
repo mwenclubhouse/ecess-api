@@ -41,5 +41,6 @@ jobs:
           sudo docker run -d --env-file environments/ecess-prod.env.list \
             -v /home/mwenclubhouse/ecess:/usr/src/app/bucket \
             --name ecess \
+            --restart always \
             -p 3000:3000 \
             ghcr.io/purdue-ecess/ecess-api:main"
