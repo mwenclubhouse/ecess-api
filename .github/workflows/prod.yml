@@ -42,4 +42,4 @@ jobs:
             -v /home/mwenclubhouse/ecess:/usr/src/app/bucket \
             --name ecess \
             -p 3000:3000 \
-            ghcr.io/purdue-ecess/ecess-api:ecess"
+            ghcr.io/purdue-ecess/ecess-api:main"
