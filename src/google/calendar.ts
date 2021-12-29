@@ -1,22 +1,17 @@
 import {google} from "googleapis";
 import moment, {Moment} from "moment";
+import {GoogleApi} from "./googleApi";
 
 const SCOPE = ["https://www.googleapis.com/auth/calendar.readonly",]
 
-export class Calendar {
+export class Calendar extends GoogleApi {
     static default: Calendar = new Calendar();
     private api: any;
     private readonly calendarId: string;
 
     private constructor() {
-        const key = JSON.parse(process.env.FIREBASE_CREDENTIALS || "{}");
-        const auth = new google.auth.JWT(
-            key.client_email,
-            undefined,
-            key.private_key,
-            SCOPE,
-        )
-        this.api = google.calendar({version: "v3", auth: auth});
+        super(SCOPE);
+        this.api = google.calendar({version: "v3", auth: this.auth});
         this.calendarId = "1t1ggg1uamf194kmrgftse1nk8@group.calendar.google.com";
     }
 

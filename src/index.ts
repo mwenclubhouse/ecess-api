@@ -2,11 +2,13 @@ import {Request, Response} from "express";
 import {Bot} from "./utils/bot";
 import {Message} from "discord.js";
 import {Api} from "./utils/api";
-import {Calendar} from "./utils/calendar";
+import {Calendar} from "./google/calendar";
 import * as stream from "stream";
 import moment from "moment/moment";
-import {MyFbStorage} from "./myFb/myFbStorage";
+import {MyFbStorage} from "./google/myFb/myFbStorage";
 import fs from "fs";
+import cron from "node-cron";
+import {Drive} from "./google/drive";
 
 
 Api.setUse(
@@ -19,19 +21,19 @@ Api.setUse(
 
 Api.setGetRoute("/", (req: any, res: any) => {
     res.send({
-        status: 'development',
+        status: process.env.ENV || 'development',
         purpose: 'ECE Student Society',
         owner: 'Purdue ECE'
     });
 });
 
 Api.setGetRoute("/bucket", async (req: any, res: any) => {
-    // const storage = MyFbStorage.loadStorage();
-    const image = req.query.image;
-    if (typeof image === "string") {
-        // const link = await storage.getFileLink(image) ;
+    const storage = MyFbStorage.loadStorage();
+    const path = req.query.path;
+    if (typeof path === "string") {
+        const link = await storage.getFileLink(path) ;
         res.send({
-            image: `https://ecess-api.matthewwen.com/blob?path=${image}`
+            image: link
         })
     }
     else {
@@ -40,6 +42,26 @@ Api.setGetRoute("/bucket", async (req: any, res: any) => {
             error: "An Error Occurred"
         })
     }
+});
+
+Api.setGetRoute("/events", async (req: any, res: any) => {
+    const storage = MyFbStorage.loadStorage();
+    const path = req.query.path;
+    const minSize = req.query.minSize || 1080;
+    let querySize = req.query.querySize || 100;
+    querySize = Math.min(100, querySize);
+
+    if (typeof path === "string") {
+        const response = await storage.listImgLinksByPath(path, minSize, querySize);
+        res.send(response)
+    }
+    else {
+        res.send({
+            image: undefined,
+            error: "An Error Occurred"
+        })
+    }
+
 });
 
 Api.setGetRoute("/blob", async (req: any, res: any) => {
@@ -88,20 +110,6 @@ Api.setGetRoute("/bot/announcements/:org", async (req: Request, res: Response) =
     }
 });
 
-
-Api.setGetRoute("/bot/announcements", async (req: Request, res: Response) => {
-    const response = await Bot.ambassador.getAnnouncements();
-    res.send(response);
-});
-
-
-Api.setWs('/ws', (ws_param: any, req: Request) => {
-    ws_param.on("message", (msg: string) => {
-        console.log(msg);
-    })
-});
-
-
 Api.setWs('/hello/:world', function(ws: any, req: any, next: any) {
 
     let interval: NodeJS.Timer | undefined = undefined;
@@ -139,8 +147,11 @@ Bot.ecess.setOnMessageCreate(async (message: Message) => {
     if (message.author.bot) {
         return;
     }
-    console.log("message", message.content);
-    // message.channel.send("testing deployment");
+});
+
+cron.schedule('0 0 */12 * * *', async function () {
+    console.log("sending drive files to fb");
+    await Drive.loadDrive().uploadDriveToFb();
 });
 
 
@@ -148,4 +159,3 @@ Api.listen();
 Bot.login().then(async () => {
     console.log("discord bot is running");
 });
-
