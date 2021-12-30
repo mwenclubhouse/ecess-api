@@ -30,17 +30,17 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v0'
 
-      - name: 'Use gcloud CLI'
+      - name: 'Use GCP CLI'
         run: |
-          gcloud info
-          gcloud compute ssh mwenclubhouse@mwenclubhouse --zone us-central1-a --command "\
+          gcloud compute ssh mwenclubhouse --zone us-central1-a --command "\
           sudo docker system prune -f -a ; \
           sudo docker pull ghcr.io/purdue-ecess/ecess-api:ecess ; \
           sudo docker stop ecess ; \
           sudo docker container rm ecess ; \
-          sudo docker run -d --env-file environments/ecess-prod.env.list \
+          sudo docker run -d --env-file /home/mwenclubhouse/environments/ecess-prod.env.list \
             -v /home/mwenclubhouse/ecess:/usr/src/app/bucket \
             --name ecess \
             --restart always \
             -p 3000:3000 \
             ghcr.io/purdue-ecess/ecess-api:main"
+          gcloud compute os-login ssh-keys remove --key-file=/home/runner/.ssh/google_compute_engine.pub

@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
 ""
-Instructions: https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions
+Instructions: 
+Setting up WIF: https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions
+Setting up SSH Keys: https://cloud.google.com/compute/docs/instances/managing-instance-access#gcloud
 ""
+
+gcloud compute instances add-metadata mwenclubhouse \
+    --metadata enable-oslogin=TRUE
 
 gcloud iam workload-identity-pools create "gh-to-vm-pool" \
   --project="mwenclubhouse" \
