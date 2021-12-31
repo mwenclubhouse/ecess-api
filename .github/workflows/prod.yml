@@ -34,7 +34,7 @@ jobs:
         run: |
           gcloud compute ssh mwenclubhouse --zone us-central1-a --command "\
           sudo docker system prune -f -a ; \
-          sudo docker pull ghcr.io/purdue-ecess/ecess-api:ecess ; \
+          sudo docker pull ghcr.io/purdue-ecess/ecess-api:main ; \
           sudo docker stop ecess ; \
           sudo docker container rm ecess ; \
           sudo docker run -d --env-file /home/mwenclubhouse/environments/ecess-prod.env.list \
