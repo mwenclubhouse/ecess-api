@@ -21,11 +21,10 @@ Api.setUse(cors({
             }, origin);
         }
         else if (process.env.ENV === undefined ||
-                origin !== undefined && origin.startsWith("https://www.purdue.ecess.org")) {
+                origin !== undefined && origin.startsWith("https://www.purdue-ecess.org")) {
             callback(null, origin);
         }
         else {
-            console.log({origin});
             callback({
                 name: "Origin is Unknown",
                 message: "Origin Used is Not Known",
