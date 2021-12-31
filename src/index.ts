@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import express, {Request, Response} from "express";
 import {Bot} from "./utils/bot";
 import {Message} from "discord.js";
 import {Api} from "./utils/api";
@@ -17,6 +17,7 @@ Api.setUse(
         return next();
     }
 )
+Api.setUse(express.json());
 
 
 Api.setGetRoute("/", (req: any, res: any) => {
@@ -25,6 +26,12 @@ Api.setGetRoute("/", (req: any, res: any) => {
         purpose: 'ECE Student Society',
         owner: 'Purdue ECE'
     });
+});
+
+Api.setPostRoute("/auth", (req: any, res: any) => {
+    console.log('receiving data ...');
+    console.log('body is ', req.body);
+    res.send(req.body);
 });
 
 Api.setGetRoute("/bucket", async (req: any, res: any) => {
@@ -149,10 +156,12 @@ Bot.ecess.setOnMessageCreate(async (message: Message) => {
     }
 });
 
-cron.schedule('0 0 */12 * * *', async function () {
-    console.log("sending drive files to fb");
-    await Drive.loadDrive().uploadDriveToFb();
-});
+if (process.env.ENV) {
+    cron.schedule('0 0 */12 * * *', async function () {
+        console.log("sending drive files to fb");
+        await Drive.loadDrive().uploadDriveToFb();
+    });
+}
 
 
 Api.listen();

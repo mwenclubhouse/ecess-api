@@ -1,6 +1,7 @@
 import {Calendar} from "../src/google/calendar";
 import {Drive} from "../src/google/drive";
 import {MyFbStorage} from "../src/google/myFb/myFbStorage";
+import {MyFbAuth} from "../src/google/myFb/myFbAuth";
 
 async function calendarMain() {
     const calendar = await Calendar.getCalendarEvents();
@@ -30,7 +31,14 @@ async function listImages() {
     console.log(response);
 }
 
+async function loginExample() {
+    const email = "mattwen2018@gmail.com";
+    const pwd = "purdue";
+    const temp: MyFbAuth = MyFbAuth.default;
+    temp.loginWithEmailAndPwd(email, pwd);
+}
+
 // My hack to keep the process alive:
-listImages().then(() => {
+loginExample().then(() => {
     console.log("Main")
 });

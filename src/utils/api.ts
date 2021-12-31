@@ -26,6 +26,10 @@ export class Api {
         this.default.app.get(route, func);
     }
 
+    static setPostRoute(route: string, func: any) {
+        this.default.app.post(route, func);
+    }
+
     static setWs(route: string, func: any) {
         this.default.app.ws(route, func);
     }
