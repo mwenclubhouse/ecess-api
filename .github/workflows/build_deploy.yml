@@ -65,6 +65,6 @@ jobs:
             -v /home/mwenclubhouse/ecess:/usr/src/app/bucket \
             --name ecess \
             --restart always \
-            -p 3000:3000 \
+            -p 3000:8000 \
             ghcr.io/purdue-ecess/ecess-api:main"
           gcloud compute os-login ssh-keys remove --key-file=/home/runner/.ssh/google_compute_engine.pub

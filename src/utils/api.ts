@@ -35,6 +35,6 @@ export class Api {
     }
 
     static listen() {
-        this.default.app.listen(process.env.PORT || 3000);
+        this.default.app.listen(process.env.PORT || 8000);
     }
 }
