@@ -10,7 +10,7 @@ export class Api {
         this.ws = expressWs(express());
     }
 
-    get app(): any {
+    get app(): Application {
         return this.ws.app;
     }
 

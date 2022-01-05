@@ -12,23 +12,24 @@ import {Drive} from "./google/drive";
 import cors from "cors";
 
 function checkOrigin(origin: string): boolean {
+    console.log({origin});
     const allowedOrigins = [
         "https://www.purdue-ecess.org",
         "https://purdue-ecess.web.app",
         "https://purdue-ecess.firebaseapp.com"
     ]
-    for (let i = 0; allowedOrigins.length; i++) {
+    for (let i = 0; i < allowedOrigins.length; i++) {
         if (origin.startsWith(allowedOrigins[i])) {
             return true;
         }
     }
-    const regex = /https:\/\/purdue-ecess--pr[0-9]*-([a-z]|[A-Z]|-|[0-9])*.web.app/
-    return regex.test(origin);
+    return origin.startsWith("https://purdue-ecess--pr") && origin.endsWith(".web.app");
 }
 
 Api.setUse(cors({
-    origin: (origin, callback) => {
+    origin: (origin: string | undefined, callback) => {
         if (origin === undefined && process.env.ENV !== undefined) {
+            console.log({origin});
             callback({
                 name: "Origin is Undefined",
                 message: "Origin Used is Not Defined",
@@ -40,6 +41,7 @@ Api.setUse(cors({
             callback(null, origin);
         }
         else {
+            console.log({origin});
             callback({
                 name: "Origin is Unknown",
                 message: "Origin Used is Not Known",
@@ -71,8 +73,17 @@ Api.setGetRoute("/img", async (req: any, res: any) => {
     const path = req.query.path;
     const minSize = req.query.minSize || 1080;
     if (typeof path === "string") {
-        const image = await storage.getImgByName(path, minSize);
-        res.send({image});
+        try {
+            const image = await storage.getImgByName(path, minSize);
+            res.send({image});
+        }
+        catch (e) {
+            console.log({img_e: e});
+            res.sendStatus(400);
+        }
+    }
+    else {
+        res.sendStatus(400);
     }
 });
 
@@ -114,17 +125,22 @@ Api.setGetRoute("/events", async (req: any, res: any) => {
 });
 
 Api.setGetRoute("/blob", async (req: any, res: any) => {
-    const path = req.query.path;
-    const r = fs.createReadStream(process.env.BUCKET_PATH + "/" + path)
-    const ps = new stream.PassThrough()
-    stream.pipeline(r, ps,
-        (err: any) => {
-            if (err) {
-                console.log(err)
-                return res.sendStatus(400);
-            }
-        })
-    ps.pipe(res)
+    if (process.env.BUCKET_PATH) {
+        const path = req.query.path;
+        const r = fs.createReadStream(process.env.BUCKET_PATH + "/" + path)
+        const ps = new stream.PassThrough()
+        stream.pipeline(r, ps,
+            (err: any) => {
+                if (err) {
+                    console.log(err)
+                    return res.sendStatus(400);
+                }
+            })
+        ps.pipe(res)
+    }
+    else {
+        res.sendStatus(400);
+    }
 })
 
 Api.setGetRoute("/calendar/:org/:cal", async (req: Request, res: Response) => {
@@ -154,8 +170,17 @@ Api.setGetRoute("/calendar/:org/:cal", async (req: Request, res: Response) => {
 Api.setGetRoute("/bot/announcements/:org", async (req: Request, res: Response) => {
     const org = req.params.org;
     if (org === "ambassadors") {
-        const response = await Bot.ambassador.getAnnouncements();
-        res.send(response);
+        try {
+            const response = await Bot.ambassador.getAnnouncements();
+            res.send(response);
+        }
+        catch (e) {
+            console.log(e);
+            res.sendStatus(400);
+        }
+    }
+    else {
+        res.sendStatus(400);
     }
 });
 
