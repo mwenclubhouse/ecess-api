@@ -39,6 +39,32 @@ export class MyFbStorage extends MyFirebase {
         return res;
     }
 
+    async getImgByName(path: string, minSize: number = 1080) {
+        const sizes = [240, 480, 720, 1080];
+        let file = this.bucket.file(`img/${path}`);
+        if (!(await file.exists())[0]) {
+            return undefined;
+        }
+        let thumbFile: File | undefined = undefined;
+        const pathArray: string[] = path.split('/');
+        const fileName: string = pathArray.pop() || "";
+
+        for (let i = 0; i < sizes.length && thumbFile === undefined; i++) {
+            if (sizes[i] >= minSize) {
+                const thumbPath = [...pathArray, `thumb@${sizes[i]}_${fileName}`].join('/');
+                thumbFile = this.bucket.file(`img/${thumbPath}`);
+                if (!(await thumbFile.exists())[0]) {
+                    thumbFile = undefined
+                }
+            }
+        }
+
+        if (thumbFile) {
+            file = thumbFile;
+        }
+        return await this.getFileLinkByFile(file);
+    }
+
     async listImgByPath(path: string, minSize: number = 1080) {
         const allFiles = await this.listDir(`img/${path}`);
         const mapThumbImg = new Map();
@@ -108,12 +134,14 @@ export class MyFbStorage extends MyFirebase {
 
             // Resize source image
             try {
-                await sharp(tmpFilePath)
-                    .resize({
-                        fit: sharp.fit.contain,
-                        width: size
-                    })
-                    .toFile(thumbPath);
+                const sharpImg = sharp(tmpFilePath).resize({width: size, fastShrinkOnLoad: false});
+                if (tmpFilePath.endsWith(".jpg")) {
+                    sharpImg.jpeg({quality: 100});
+                }
+                if (tmpFilePath.endsWith(".png")) {
+                    sharpImg.png({quality: 100});
+                }
+                await sharpImg.toFile(thumbPath);
 
                 // Upload to GCS
                 return this.bucket.upload(thumbPath, {

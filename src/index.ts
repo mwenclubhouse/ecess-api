@@ -11,6 +11,20 @@ import cron from "node-cron";
 import {Drive} from "./google/drive";
 import cors from "cors";
 
+function checkOrigin(origin: string): boolean {
+    [
+        "https://www.purdue-ecess.org",
+        "https://purdue-ecess.web.app",
+        "https://purdue-ecess.firebaseapp.com"
+    ].forEach((item) => {
+        if (origin.startsWith(item)) {
+            return true;
+        }
+    })
+    const regex = /https:\/\/purdue-ecess--pr[0-9]*-([a-z]|[A-Z]|-|[0-9])*.web.app/
+    return regex.test(origin);
+}
+
 Api.setUse(cors({
     origin: (origin, callback) => {
         if (origin === undefined && process.env.ENV !== undefined) {
@@ -21,7 +35,7 @@ Api.setUse(cors({
             }, origin);
         }
         else if (process.env.ENV === undefined ||
-                origin !== undefined && origin.startsWith("https://www.purdue-ecess.org")) {
+            origin !== undefined && checkOrigin(origin)) {
             callback(null, origin);
         }
         else {
@@ -49,6 +63,16 @@ Api.setPostRoute("/auth", (req: any, res: any) => {
     console.log('receiving data ...');
     console.log('body is ', req.body);
     res.send(req.body);
+});
+
+Api.setGetRoute("/img", async (req: any, res: any) => {
+    const storage = MyFbStorage.loadStorage();
+    const path = req.query.path;
+    const minSize = req.query.minSize || 1080;
+    if (typeof path === "string") {
+        const image = await storage.getImgByName(path, minSize);
+        res.send({image});
+    }
 });
 
 Api.setGetRoute("/bucket", async (req: any, res: any) => {

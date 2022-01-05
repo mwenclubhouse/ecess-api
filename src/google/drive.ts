@@ -32,11 +32,11 @@ export class Drive extends GoogleApi {
         return Drive.default;
     }
 
-    async uploadDriveToFb() {
+    async uploadDriveToFb(force=false) {
         const drive = Drive.loadDrive();
         const response = await drive.listFiles();
         for (let i = 0; i < response.length; i++) {
-            await drive.resizeImgObj(response[i]);
+            await drive.resizeImgObj(response[i], force);
         }
     }
 
@@ -67,9 +67,9 @@ export class Drive extends GoogleApi {
         });
     }
 
-    async resizeImgObj(driveObj: { name?: any; id?: any; }) {
+    async resizeImgObj(driveObj: { name?: any; id?: any; }, force=false) {
         const storage = MyFbStorage.loadStorage();
-        const fileExists = await storage.fileExists(driveObj.name);
+        const fileExists = await storage.fileExists(driveObj.name) && !force;
         if (!driveObj.name?.startsWith("img/") || fileExists) {
             return new Promise(resolve => resolve(null));
         }

@@ -38,7 +38,11 @@ async function loginExample() {
     temp.loginWithEmailAndPwd(email, pwd);
 }
 
+async function googleDriveToFb() {
+    await Drive.loadDrive().uploadDriveToFb(true);
+}
+
 // My hack to keep the process alive:
-loginExample().then(() => {
+googleDriveToFb().then(() => {
     console.log("Main")
 });
