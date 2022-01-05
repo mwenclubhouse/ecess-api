@@ -12,15 +12,16 @@ import {Drive} from "./google/drive";
 import cors from "cors";
 
 function checkOrigin(origin: string): boolean {
-    [
+    const allowedOrigins = [
         "https://www.purdue-ecess.org",
         "https://purdue-ecess.web.app",
         "https://purdue-ecess.firebaseapp.com"
-    ].forEach((item) => {
-        if (origin.startsWith(item)) {
+    ]
+    for (let i = 0; allowedOrigins.length; i++) {
+        if (origin.startsWith(allowedOrigins[i])) {
             return true;
         }
-    })
+    }
     const regex = /https:\/\/purdue-ecess--pr[0-9]*-([a-z]|[A-Z]|-|[0-9])*.web.app/
     return regex.test(origin);
 }

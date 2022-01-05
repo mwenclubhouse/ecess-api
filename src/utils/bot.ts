@@ -6,7 +6,7 @@ import {
     Intents,
     Message,
     NewsChannel,
-    PartialMessage,
+    PartialMessage, Role,
 } from "discord.js";
 import {config} from "dotenv";
 import axios from "axios";
@@ -87,10 +87,9 @@ export class Bot {
         for (let k of messages) {
             const m: Message = k[1];
             const name = await guild.members.fetch(m.author.id);
-            console.log(-1 != ["Giselle"].indexOf(name.displayName));
             response.push({
                 author: name.displayName,
-                content: Bot.HTMLParser(m.content),
+                content: await this.HTMLParser(m.content),
                 date: m.editedAt || m.createdAt,
                 label: -1 != ["Giselle", "Leigh Ann"].indexOf(name.displayName) ? "Advisor": (name.displayName === "Sara Hui" ? "Head Ambassador": "Ambassador")
             });
@@ -98,31 +97,44 @@ export class Bot {
         return response;
     }
 
-    static HTMLParser(message: String): string {
-        let words = message.split(' ');
-        let new_message = "";
-        let new_word;
-
-        for (let word of words) {
-            //test case 1: link -> <a href =*link*>*link*</a> PASSES
-            if (word.startsWith('https://')) {
-                new_word = "<a href=" + word + ">" + word + "</a>"
-                new_message += new_word
+    async HTMLParser(message: string): Promise<string> {
+        // test case 1 links
+        message = linkify(message);
+        // test case 2 new lines
+        message = message.replace(/\n/, (item) => (
+            "<br>"
+        ));
+        //test case 3 (@) for roles
+        const roleSet: Set<string> = new Set();
+        const guild: Guild | undefined = await this.guild;
+        message.replace(/<@&[0-9]*>/, (item, ...args) => {
+            const roleId = item.substr(3, item.length - 4);
+            if (!roleSet.has(roleId)) {
+                roleSet.add(roleId);
             }
-            //TODO test case 2 (bold)
-            else if (word.includes("\n")) {
-                //test case 3: \n -> <br> PASSES
-                new_word = word.split("\n").join("<br>") // find replaceAll function?
-                new_message += new_word
-            }
-            else {
-                new_message += word
-            }
-            //TODO test case 4 (@)
-            //TODO test case 5 (images)
-            new_message += " "
+            return item;
+        });
+        for(let key of roleSet) {
+            const role: Role | undefined | null = await guild?.roles.fetch(key);
+            message = message.replace(`<@&${key}>`, `<mark>@${role?.name || undefined}</mark>`);
         }
-        return new_message.trim()
+
+        //TODO test case 4 (@) for members
+        const userSet: Set<string> = new Set();
+        message.replace(/<@![0-9]*>/, (item, ...args) => {
+            const userId = item.substr(3, item.length - 4);
+            if (!userSet.has(userId)) {
+                userSet.add(userId);
+            }
+            return item;
+        });
+        for (let key of userSet) {
+            const user = await guild?.members.fetch(key);
+            message = message.replace(`<@!${key}>`, `<mark>@${user?.nickname || undefined}</mark>`);
+        }
+
+        //TODO test case 5 (images)
+        return message;
     }
 
     static async login() {
