@@ -1,8 +1,4 @@
-// import ECESS_MEMBERS from data_people;
-
-console.log("Running transfer users script...");
-
-const ECESS_MEMBERS = [
+export const ECESS_MEMBERS = [
     {
         name: "Ryan Villarreal",
         major: "Computer Engineering",
@@ -290,6 +286,7 @@ const ECESS_MEMBERS = [
         picture: 'people/jamesdonnelly.jpg',
         major: 'Computer Engineering',
         graduation: 'May 2022',
+        email: "donnell9@purdue.edu",
         ecess_organization: {"Ambassadors": {
                 clubs: ["Eta Kappa Nu" , "IEEE" , "Purdue Jazz Bands", "ECEA Web Dev"],
             }},
@@ -591,21 +588,3 @@ const ECESS_MEMBERS = [
         },
     },
 ]
-
-const fs = require('firebase-admin');
-
-const serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-
-fs.initializeApp({
- credential: fs.credential.cert(serviceAccount)
-});
-
-const db = fs.firestore(); 
-
-const usersDb = db.collection('users');
-
-ECESS_MEMBERS.forEach((item) => {
-    const addName = usersDb.doc(item.name);
-    addName.set(item);
-    console.log("Added " + item.name)
-})

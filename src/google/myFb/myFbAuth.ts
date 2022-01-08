@@ -9,6 +9,10 @@ export class MyFbAuth extends MyFirebase {
         super();
     }
 
+    public getAuth() {
+        return getAuth();
+    }
+
     public async loginWithEmailAndPwd(email: string, pwd: string) { 
         const idToken = "hi there";
         const response = await getAuth().verifyIdToken(idToken)

@@ -1,18 +1,19 @@
-import express, {Request, Response} from "express";
-import {Bot} from "./utils/bot";
-import {Message} from "discord.js";
-import {Api} from "./utils/api";
-import {Calendar} from "./google/calendar";
+import express, { Request, Response } from "express";
+import { Bot } from "./utils/bot";
+import { Message } from "discord.js";
+import { Api } from "./utils/api";
+import { Calendar } from "./google/calendar";
 import * as stream from "stream";
 import moment from "moment/moment";
-import {MyFbStorage} from "./google/myFb/myFbStorage";
+import { MyFbStorage } from "./google/myFb/myFbStorage";
 import fs from "fs";
 import cron from "node-cron";
-import {Drive} from "./google/drive";
+import { Drive } from "./google/drive";
 import cors from "cors";
+import { getAuth, DecodedIdToken, UserRecord } from "firebase-admin/auth";
 
 function checkOrigin(origin: string): boolean {
-    console.log({origin});
+    console.log({ origin });
     const allowedOrigins = [
         "https://www.purdue-ecess.org",
         "https://purdue-ecess.web.app",
@@ -26,10 +27,29 @@ function checkOrigin(origin: string): boolean {
     return origin.startsWith("https://purdue-ecess--pr") && origin.endsWith(".web.app");
 }
 
+/**
+ * Decodes the JSON Web Token sent via the frontend app
+ * Makes the currentUser (firebase) data available on the body.
+ */
+async function decodeIDToken(req: Request): Promise<(UserRecord | undefined)> {
+    if (req.headers?.authorization?.startsWith('Bearer ')) {
+        const idToken = req.headers.authorization.split('Bearer ')[1];
+        console.log({idToken});
+        try {
+            const decodedToken: DecodedIdToken = await getAuth().verifyIdToken(idToken);
+            console.log({ decodedToken })
+            return await getAuth().getUser(decodedToken.uid);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+    return undefined;
+}
+
 Api.setUse(cors({
     origin: (origin: string | undefined, callback) => {
+        console.log({ origin });
         if (origin === undefined && process.env.ENV !== undefined) {
-            console.log({origin});
             callback({
                 name: "Origin is Undefined",
                 message: "Origin Used is Not Defined",
@@ -41,7 +61,6 @@ Api.setUse(cors({
             callback(null, origin);
         }
         else {
-            console.log({origin});
             callback({
                 name: "Origin is Unknown",
                 message: "Origin Used is Not Known",
@@ -62,7 +81,28 @@ Api.setGetRoute("/", (req: any, res: any) => {
     });
 });
 
-Api.setPostRoute("/auth", (req: any, res: any) => {
+Api.setGetRoute("/members", async (req: any, res: any) => {
+    console.log("/members route");
+    const user = await decodeIDToken(req);
+    console.log({user});
+    if (user === undefined) {
+        res.send({status: "failure"});
+    }
+    else {
+        res.send({status: "good"});
+    }
+    console.log('receiving data ...');
+    console.log('body is ', req.body);
+});
+
+Api.setPostRoute("/auth", async (req: any, res: any) => {
+    const user = await decodeIDToken(req);
+    if (user === undefined) {
+        res.send({status: "failure"});
+    }
+    else {
+        res.send({status: "good"});
+    }
     console.log('receiving data ...');
     console.log('body is ', req.body);
     res.send(req.body);
@@ -75,10 +115,10 @@ Api.setGetRoute("/img", async (req: any, res: any) => {
     if (typeof path === "string") {
         try {
             const image = await storage.getImgByName(path, minSize);
-            res.send({image});
+            res.send({ image });
         }
         catch (e) {
-            console.log({img_e: e});
+            console.log({ img_e: e });
             res.sendStatus(400);
         }
     }
@@ -91,7 +131,7 @@ Api.setGetRoute("/bucket", async (req: any, res: any) => {
     const storage = MyFbStorage.loadStorage();
     const path = req.query.path;
     if (typeof path === "string") {
-        const link = await storage.getFileLink(path) ;
+        const link = await storage.getFileLink(path);
         res.send({
             image: link
         })
@@ -162,7 +202,7 @@ Api.setGetRoute("/calendar/:org/:cal", async (req: Request, res: Response) => {
     }
 
     if (error) {
-        res.send({error: "calendar is not found"})
+        res.send({ error: "calendar is not found" })
         res.statusCode = 400;
     }
 });
@@ -184,7 +224,7 @@ Api.setGetRoute("/bot/announcements/:org", async (req: Request, res: Response) =
     }
 });
 
-Api.setWs('/hello/:world', function(ws: any, req: any, next: any) {
+Api.setWs('/hello/:world', function (ws: any, req: any, next: any) {
 
     let interval: NodeJS.Timer | undefined = undefined;
     let message = "sending data back";
@@ -192,7 +232,7 @@ Api.setWs('/hello/:world', function(ws: any, req: any, next: any) {
     ws.on('open', function () {
         console.log('open connection');
     })
-    ws.on('message', function(msg: string) {
+    ws.on('message', function (msg: string) {
         console.log(msg);
         if (msg === "stream" && interval === undefined) {
             interval = setInterval(() => {
@@ -207,7 +247,7 @@ Api.setWs('/hello/:world', function(ws: any, req: any, next: any) {
             message = msg;
         }
     });
-    ws.on("close", function() {
+    ws.on("close", function () {
         if (interval) {
             console.log("close interval");
             clearInterval(interval);

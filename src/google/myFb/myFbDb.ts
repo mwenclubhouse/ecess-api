@@ -4,7 +4,7 @@ import {MyFirebase} from "./myFb";
 export class MyFbDb extends MyFirebase {
 
     static default: MyFbDb = new MyFbDb();
-    private firestone: FirebaseFirestore.Firestore;
+    public firestone: FirebaseFirestore.Firestore;
 
     private constructor() {
         super();
