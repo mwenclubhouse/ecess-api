@@ -39,7 +39,7 @@ async function loginExample() {
 }
 
 async function googleDriveToFb() {
-    await Drive.loadDrive().uploadDriveToFb(true);
+    await Drive.loadDrive().uploadDriveToFb();
 }
 
 // My hack to keep the process alive:

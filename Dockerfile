@@ -18,4 +18,9 @@ RUN npm run build
 
 EXPOSE 3000
 
+# Bundle C Code
+RUN apt update
+RUN apt upgrade -y
+RUN apt install imagemagick -y
+
 CMD [ "node", "dist/src/index.js" ]

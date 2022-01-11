@@ -1,14 +1,16 @@
 /*
 Image Resizer: https://fireship.io/lessons/image-thumbnail-resizer-cloud-function/
  */
+/* https://github.com/rsms/node-imagemagick#readme */
 import { getStorage, Storage } from "firebase-admin/storage";
-import {Bucket, File, Notification} from '@google-cloud/storage';
+import {Bucket, File} from '@google-cloud/storage';
 import {MyFirebase} from "./myFb";
 import {tmpdir} from 'os';
 import {join, dirname} from 'path';
-import sharp from 'sharp';
 import * as fs from 'fs-extra';
 import {getSizeAndFileName} from "../../utils/utils";
+import * as im from 'imagemagick';
+import {file} from "googleapis/build/src/apis/file";
 
 export class MyFbStorage extends MyFirebase {
 
@@ -134,19 +136,22 @@ export class MyFbStorage extends MyFirebase {
 
             // Resize source image
             try {
-                const sharpImg = sharp(tmpFilePath).resize({width: size, fastShrinkOnLoad: false});
-                if (tmpFilePath.endsWith(".jpg")) {
-                    sharpImg.jpeg({quality: 100});
-                }
-                if (tmpFilePath.endsWith(".png")) {
-                    sharpImg.png({quality: 100});
-                }
-                await sharpImg.toFile(thumbPath);
-
-                // Upload to GCS
-                return this.bucket.upload(thumbPath, {
-                    destination: join(bucketDir, thumbName)
-                });
+                return new Promise<any>((resolve) => {
+                    console.log("running on ", {fileName, thumbName});
+                    im.convert([tmpFilePath, '-resize', `${size}x`, thumbPath], async err => {
+                        // Upload to GCS
+                        if (!err) {
+                            const response = await this.bucket.upload(thumbPath, {
+                                destination: join(bucketDir, thumbName)
+                            });
+                            resolve(response);
+                        }
+                        else {
+                            console.log('image resize error: ' + err);
+                            resolve(undefined);
+                        }
+                    })
+                })
             }
             catch (e) {
                 console.log({fileName, e});
