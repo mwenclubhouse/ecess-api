@@ -11,6 +11,7 @@ import cron from "node-cron";
 import { Drive } from "./google/drive";
 import cors from "cors";
 import { getAuth, DecodedIdToken, UserRecord } from "firebase-admin/auth";
+import {MyFbAuth} from "./google/myFb/myFbAuth";
 
 function checkOrigin(origin: string): boolean {
     console.log({ origin });
@@ -34,10 +35,8 @@ function checkOrigin(origin: string): boolean {
 async function decodeIDToken(req: Request): Promise<(UserRecord | undefined)> {
     if (req.headers?.authorization?.startsWith('Bearer ')) {
         const idToken = req.headers.authorization.split('Bearer ')[1];
-        console.log({idToken});
         try {
             const decodedToken: DecodedIdToken = await getAuth().verifyIdToken(idToken);
-            console.log({ decodedToken })
             return await getAuth().getUser(decodedToken.uid);
         } catch (err) {
             console.log(err);
@@ -222,6 +221,26 @@ Api.setGetRoute("/bot/announcements/:org", async (req: Request, res: Response) =
     else {
         res.sendStatus(400);
     }
+});
+
+Api.setPostRoute("/updateUser", async function (req: Request, res: Response) {
+    const user = await decodeIDToken(req);
+    if (user) {
+        const attribute = req.body;
+        let properties: any = {};
+        if (attribute.name) {
+            properties["displayName"] = attribute.name;
+        }
+        if (attribute.email) {
+            properties["email"] = attribute.email;
+        }
+        await MyFbAuth.default.getAuth().updateUser(user.uid, properties);
+        res.send({properties: properties})
+    }
+    else {
+        res.sendStatus(400);
+    }
+
 });
 
 Api.setWs('/hello/:world', function (ws: any, req: any, next: any) {
