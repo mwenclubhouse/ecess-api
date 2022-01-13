@@ -16,35 +16,60 @@ function makeid(length: number) {
 
 const usersDb = MyFbDb.default.firestone.collection('users');
 const auth: Auth = MyFbAuth.default.getAuth();
-const main = async () => {
-    for (let i = 0; i < ECESS_MEMBERS.length; i++) {
-        const item = ECESS_MEMBERS[i];
-        let user: UserRecord | undefined = undefined;
-        if (item.email) {
-            try {
-                user = await auth.getUserByEmail(item.email);
-            }
-            catch (e) {
-                const password = makeid(10);
-                user = await auth.createUser({
-                    displayName: item.name,
-                    email: item.email,
-                    emailVerified: false,
-                });
-                console.log(`email: ${item.email}, password: ${password}`);
-            }
+
+const getMapByName = async () => {
+    const nameMap = new Map();
+    const promises: Promise<any>[] = [];
+    (await usersDb.get()).docs.map((item) => {
+        const data = item.data()
+        if (nameMap.has(data.name)) {
+            promises.push(usersDb.doc(item.id).delete());
+            promises.push(auth.deleteUser(item.id))
         }
         else {
-            user = await auth.createUser({
-                displayName: item.name,
-                emailVerified: false
-            });
+            nameMap.set(data.name, data);
         }
-        if (user) {
-            const addUser = usersDb.doc(user.uid);
-            addUser.set(item);
+    })
+    try {
+        await Promise.all(promises);
+    }
+    catch (e) {
+        console.log(e);
+    }
+    return nameMap;
+}
+
+const main = async () => {
+    const mapByName = await getMapByName();
+    for (let i = 0; i < ECESS_MEMBERS.length; i++) {
+        const item = ECESS_MEMBERS[i];
+        if (!mapByName.has(item.name)) {
+            let user: UserRecord | undefined = undefined;
+            if (item.email) {
+                try {
+                    user = await auth.getUserByEmail(item.email);
+                }
+                catch (e) {
+                    const password = makeid(10);
+                    user = await auth.createUser({
+                        displayName: item.name,
+                        email: item.email,
+                        emailVerified: false,
+                    });
+                    console.log(`email: ${item.email}, password: ${password}`);
+                }
+            }
+            else {
+                user = await auth.createUser({
+                    displayName: item.name,
+                    emailVerified: false
+                });
+            }
+            if (user) {
+                const addUser = usersDb.doc(user.uid);
+                await addUser.set(item);
+            }
         }
-        // if (user)
     }
 }
 

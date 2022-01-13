@@ -32,7 +32,7 @@ export const ECESS_MEMBERS = [
                 quote: 'I exploded my capacitor in 20007. Sad but true.',
                 clubs: ["President of ECEA"],
             },
-            "wece": null,
+            "wece": undefined,
             "ECESS": {
                 board_position: "ECE Ambassador Chair",
                 fav_class: "ECE 44000",
@@ -60,8 +60,11 @@ export const ECESS_MEMBERS = [
                 quote: "Simple can be harder than complex.",
                 board_position: "Spark Chair",
                 fav_class: "ECE 27000"
+            },
+            "Spark": {
+                position: "President"
             }
-       },
+        },
         ambassador: true
     },
     {
@@ -80,7 +83,7 @@ export const ECESS_MEMBERS = [
                 clubs: ["Phi Sigma Rho" , "Higher Ground Dance Co.", "Purdue Society of Women Engineers"],
                 quote: "Came for the starting salary. Stayed for the therapy group.",
             },
-            "wece": null,
+            "wece": undefined,
             "ECESS": {
                 board_position: "Publicity Chair",
                 quote: "Let courage carry you",
@@ -99,8 +102,8 @@ export const ECESS_MEMBERS = [
         ],
         ecess_board_position: "Vice President",
         ecess_organization: {
-            "Ambassadors": null,
-            "wece": null,
+            "Ambassadors": undefined,
+            "wece": undefined,
             "ECESS": {
                 board_position: "Vice President",
                 quote: "Believe you can and you're halfway there.",
@@ -147,7 +150,7 @@ export const ECESS_MEMBERS = [
         picture: 'people/michaelworthington.jpg',
         major: 'Electrical Engineering',
         graduation: 'December 2023',
-        ecess_organization: {"Ambassadors": null},
+        ecess_organization: {"Ambassadors": undefined},
         links: [
             {'name': 'linkedin', link: 'https://www.linkedin.com/in/j-michael-worthington/'},
         ]
@@ -194,7 +197,7 @@ export const ECESS_MEMBERS = [
         picture: 'people/graceulmer.jpg',
         major: 'Electrical Engineering',
         graduation: 'May 2022',
-        ecess_organization: {"Ambassadors": null, "wece": null},
+        ecess_organization: {"Ambassadors": undefined, "wece": undefined},
         links: [
             {'name': 'Linkedin', 'link': 'https://www.linkedin.com/in/grace-ulmer-056278179/'},
         ]
@@ -215,7 +218,7 @@ export const ECESS_MEMBERS = [
         name: 'Jason Chamness',
         picture: 'people/jasonchamness.jpg',
         major: 'Computer Engineering',
-        ecess_organization: {"Ambassadors": null},
+        ecess_organization: {"Ambassadors": undefined},
         graduation: 'May 2022',
         links: [
             {'name': 'Linkedin', 'link': 'https://www.linkedin.com/in/jason-chamness-447b9516b/'},
@@ -275,7 +278,7 @@ export const ECESS_MEMBERS = [
         name: 'Noah Thoma',
         picture: 'people/noahthoma.jpg',
         major: 'Computer Engineering',
-        ecess_organization: {"Ambassadors": null},
+        ecess_organization: {"Ambassadors": undefined},
         graduation: 'December 2022',
         links: [
             {'name': 'Linkedin', 'link': 'https://www.linkedin.com/in/noahthoma/'},
@@ -286,7 +289,6 @@ export const ECESS_MEMBERS = [
         picture: 'people/jamesdonnelly.jpg',
         major: 'Computer Engineering',
         graduation: 'May 2022',
-        email: "donnell9@purdue.edu",
         ecess_organization: {"Ambassadors": {
                 clubs: ["Eta Kappa Nu" , "IEEE" , "Purdue Jazz Bands", "ECEA Web Dev"],
             }},
@@ -311,7 +313,7 @@ export const ECESS_MEMBERS = [
         name: 'Sihun Kim',
         picture: 'people/sihunkim.jpg',
         major: 'Electrical Engineering',
-        ecess_organization: {"Ambassadors": null},
+        ecess_organization: {"Ambassadors": undefined},
         graduation: 'December 2023',
         links: [
             {'name': 'Linkedin', 'link': 'https://www.linkedin.com/in/sihun-kim/'},
@@ -334,7 +336,7 @@ export const ECESS_MEMBERS = [
         picture: 'people/vikramsrivastava.jpg',
         major: 'Computer Engineering',
         graduation: 'December 2021',
-        ecess_organization: {"Ambassadors": null},
+        ecess_organization: {"Ambassadors": undefined},
         links: [
             {'name': 'Linkedin', 'link': 'https://www.linkedin.com/in/vikramsrivastava1/'},
         ]
@@ -364,13 +366,17 @@ export const ECESS_MEMBERS = [
     },
     {
         name: 'Brady Smith',
-        picture: 'people/bradysmith.jpg',
-        major: 'Computer Engineering',
+        picture: 'people/bradysmith2.jpg',
+        major: 'Electrical Engineering',
         graduation: 'May 2023',
-        ecess_organization: {"Ambassadors": {
+        ecess_organization: {
+            "Ambassadors": {
                 clubs: ["Purdue Women in ECE"],
             },
-            "wece": null
+            "wece": undefined,
+            "Spark": {
+                position: "Vice President"
+            }
         },
         links: [
             {'name': 'Linkedin', 'link': 'https://www.linkedin.com/in/bradyeesmith/'},
@@ -382,8 +388,8 @@ export const ECESS_MEMBERS = [
         major: 'Electrical Engineering',
         graduation: 'May 2022',
         ecess_organization: {
-            "Ambassadors": null,
-            "wece": null
+            "Ambassadors": undefined,
+            "wece": undefined
         },
         links: [
             {'name': 'Linkedin', 'link': 'https://www.linkedin.com/in/elizabeth-thomas-768b0b143/'},
@@ -394,7 +400,7 @@ export const ECESS_MEMBERS = [
         picture: 'people/zachvandermissen.jpg',
         major: 'Electrical Engineering',
         graduation: 'December 2021',
-        ecess_organization: {"Ambassadors": null},
+        ecess_organization: {"Ambassadors": undefined},
         links: [
             {'name': 'Linkedin', 'link': 'https://www.linkedin.com/in/zach-vander-missen-15711256/'},
         ]
@@ -586,5 +592,75 @@ export const ECESS_MEMBERS = [
                 quote: "You change the world when you change your mind"
             }
         },
+    },
+    {
+        name: "Waewta Saw",
+        picture: "people/waewtasaw.jpeg",
+        graduation: "May 2022",
+        ecess_organization: {
+            "Spark": {
+                position: "270/362 Communications"
+            }
+        }
+    },
+    {
+        name: "Dhanya Prem",
+        ecess_organization: {
+            "Spark": {
+                position: "Corporate Partner Communications"
+            }
+        },
+        picture: "people/dhanyaprem.jpg",
+        graduation: "December 2022"
+    },
+    {
+        name: "Samantha Dreussi",
+        ecess_organization: {
+            "Spark": {
+                position: "Teams Communications"
+            }
+        },
+        graduation: "May 2024",
+        picture: "people/samanthadreussi.jpg"
+    },
+    {
+        name: "Raghav Kumar",
+        ecess_organization: {
+            "Spark": {
+                position: "Teams Communications"
+            }
+        },
+        graduation: "May 2024",
+        picture: "people/raghavkumar.jpg"
+    },
+    {
+        name: "Roshni Sharma",
+        ecess_organization: {
+            "Spark": {
+                position: "Event Support"
+            }
+        },
+        graduation: "May 2023",
+        picture: "people/roshnisharma.jpg"
+    },
+    {
+        name: "Nahush Walvekar ",
+        ecess_organization: {
+            "Spark": {
+                position: "Event Support"
+            }
+        },
+        graduation: "May 2024",
+        picture:  "people/nahushwalvekar.jpg"
+    },
+    {
+        name: "Vivek Panchagnula",
+        ecess_organization: {
+            "Spark": {
+                position: "Event Support"
+            }
+        },
+        graduation: "May 2025",
+        picture: "people/vivekpanchagnula.jpeg"
     },
 ]
