@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import moment from "moment/moment";
 import {Calendar} from "../google/calendar";
 import {Bot} from "../utils/bot";
+import {MyFbDb} from "../google/myFb/myFbDb";
 
 
 export function requestCalendar() {
@@ -13,7 +14,11 @@ export function requestCalendar() {
         if (typeof day === "string" || day == undefined) {
             const all_events = await Calendar.getCalendarEvents(day);
             const discord_events = await Bot.ecess.discordCalendar(day);
+            const fb_events = await MyFbDb.getEvents(day);
             discord_events.forEach((item) => {
+                all_events.push(item);
+            })
+            fb_events.forEach((item) => {
                 all_events.push(item);
             })
             all_events.sort((i1: any, i2: any) => {
