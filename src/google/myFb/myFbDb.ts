@@ -35,8 +35,8 @@ export class MyFbDb extends MyFirebase {
         const query = date.toISOString().split('T')[0] + "T99:9:99:999Z";
         const response = await this.default.firestone
             .collection("events")
-            .where("end.dateTime", "<=",  query)
-            .orderBy("end.dateTime", "asc").get();
+            .where("start.dateTime", "<=",  query)
+            .orderBy("start.dateTime", "asc").get();
         const items: any[] = [];
         const startWith = date.toISOString().split('T')[0];
         response.forEach((item) => {
