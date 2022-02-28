@@ -2,17 +2,7 @@
 import { MyFbDb } from "../src/google/myFb/myFbDb";
 import { MyFbAuth } from "../src/google/myFb/myFbAuth";
 import { Auth , UserRecord} from "firebase-admin/auth";
-import { ECESS_MEMBERS } from "./data";
-
-function makeid(length: number) {
-    var result = '';
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for (var i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-}
+import { ECESS_MEMBERS } from "./ambassador";
 
 const usersDb = MyFbDb.default.firestone.collection('users');
 const auth: Auth = MyFbAuth.default.getAuth();
@@ -27,7 +17,7 @@ const getMapByName = async () => {
             promises.push(auth.deleteUser(item.id))
         }
         else {
-            nameMap.set(data.name, data);
+            nameMap.set(data.name, {...data, id: item.id});
         }
     })
     try {
@@ -43,33 +33,44 @@ const main = async () => {
     const mapByName = await getMapByName();
     for (let i = 0; i < ECESS_MEMBERS.length; i++) {
         const item = ECESS_MEMBERS[i];
-        if (!mapByName.has(item.name)) {
-            let user: UserRecord | undefined = undefined;
-            if (item.email) {
-                try {
-                    user = await auth.getUserByEmail(item.email);
-                }
-                catch (e) {
-                    const password = makeid(10);
-                    user = await auth.createUser({
-                        displayName: item.name,
-                        email: item.email,
-                        emailVerified: false,
-                    });
-                    console.log(`email: ${item.email}, password: ${password}`);
-                }
+        let userData: any = {};
+        let user: UserRecord | undefined = undefined;
+        if (item.email) {
+            try {
+                user = await auth.getUserByEmail(item.email);
+                userData.id = user.uid;
+                userData = mapByName.get(item.name) || {}
             }
-            else {
-                user = await auth.createUser({
-                    displayName: item.name,
-                    emailVerified: false
-                });
-            }
-            if (user) {
-                const addUser = usersDb.doc(user.uid);
-                await addUser.set(item);
+            catch (e) {
+                userData = mapByName.get(item.name);
             }
         }
+        if (userData) { // {id: user id} or {name: ... etc..}
+            user = await auth.getUser(userData.id)
+            await auth.updateUser(userData.id, {
+                email: item.email,
+                emailVerified: true
+            })
+        }
+        else {
+            // user is not in database, create a new user
+            user = await auth.createUser({
+                displayName: item.name,
+                email: item.email || undefined,
+                emailVerified: item.email !== undefined
+            });
+            userData = {id: user.uid};
+        }
+
+        // merge + add to database
+        const mergedData = {...userData, ...item}
+        mergedData.ecess_organization = {...(userData.ecess_organization || {}), ...(item.ecess_organization)};
+        delete mergedData.id
+        const addUser = usersDb.doc(userData.id)
+        await addUser.set(mergedData)
+
+        // send email verification
+        console.log(mergedData.email);
     }
 }
 
