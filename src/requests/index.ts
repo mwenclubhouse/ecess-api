@@ -9,7 +9,6 @@ import express from "express";
 function requestInit() {
     Api.setUse(cors({
         origin: (origin: string | undefined, callback) => {
-            console.log({ origin });
             if (origin === undefined && process.env.ENV !== undefined) {
                 callback({
                     name: "Origin is Undefined",

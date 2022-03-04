@@ -24,6 +24,10 @@ export class MyFbDb extends MyFirebase {
         await Promise.all(promises);
     }
 
+    static async getUserDb(uid: string) {
+        return (await this.default.firestone.collection("users").doc(uid).get()).data();
+    }
+
     static async getEvents(dateStr: string | undefined) {
         if (dateStr === undefined) {
             return [];

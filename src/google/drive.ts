@@ -22,6 +22,7 @@ export class Drive extends GoogleApi {
 
     private readonly api: any;
     private static default: Drive = new Drive();
+    private running: boolean = false;
 
     private constructor() {
         super(SCOPES);
@@ -33,11 +34,16 @@ export class Drive extends GoogleApi {
     }
 
     async uploadDriveToFb(force=false) {
+        this.running = true;
+        if (this.running) {
+            return
+        }
         const drive = Drive.loadDrive();
         const response = await drive.listFiles();
         for (let i = 0; i < response.length; i++) {
             await drive.resizeImgObj(response[i], force);
         }
+        this.running = false;
     }
 
     listFilesInDir(folderId: string | undefined) : Promise<any[]>{
@@ -132,7 +138,7 @@ export class Drive extends GoogleApi {
                 else {
                     files.push({
                         ...item,
-                        name: key.substr(1)
+                        name: key.substring(1)
                     });
                 }
             }

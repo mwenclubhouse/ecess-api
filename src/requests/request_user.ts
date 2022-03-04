@@ -4,8 +4,7 @@ import {MyFbAuth} from "../google/myFb/myFbAuth";
 import {decodeIDToken} from "../utils/utils";
 import {getAuth} from "firebase-admin/auth";
 import {MyFbDb} from "../google/myFb/myFbDb";
-import {firestore} from "firebase-admin";
-import DocumentReference = firestore.DocumentReference;
+import {Drive} from "../google/drive";
 
 export function requestUser() {
 
@@ -26,6 +25,21 @@ export function requestUser() {
         else {
             res.sendStatus(400);
         }
+    });
+
+    Api.setPostRoute("/drive/transform", async function (req: Request, res: Response) {
+        const user = await decodeIDToken(req);
+        if (!user) {
+            res.sendStatus(400);
+            return;
+        }
+        const admin = await MyFbDb.getUserDb(user.uid);
+        if (!admin || !admin.admin) {
+            res.sendStatus(400);
+        }
+        const attribute = req.body;
+        Drive.loadDrive().uploadDriveToFb(attribute.force || false).then();
+        res.sendStatus(200);
     });
 
     Api.setPostRoute("/ecess/addUser", async function(req: Request, res: Response) {
