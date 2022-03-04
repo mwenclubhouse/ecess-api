@@ -2,7 +2,7 @@
 import { MyFbDb } from "../src/google/myFb/myFbDb";
 import { MyFbAuth } from "../src/google/myFb/myFbAuth";
 import { Auth , UserRecord} from "firebase-admin/auth";
-import { ECESS_MEMBERS } from "./ambassador";
+import { ECESS_MEMBERS } from "./data";
 
 const usersDb = MyFbDb.default.firestone.collection('users');
 const auth: Auth = MyFbAuth.default.getAuth();

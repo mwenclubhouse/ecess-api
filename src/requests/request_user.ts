@@ -38,8 +38,8 @@ export function requestUser() {
             res.sendStatus(400);
         }
         const attribute = req.body;
-        Drive.loadDrive().uploadDriveToFb(attribute.force || false).then();
         res.sendStatus(200);
+        await Drive.loadDrive().uploadDriveToFb(attribute.force || false);
     });
 
     Api.setPostRoute("/ecess/addUser", async function(req: Request, res: Response) {

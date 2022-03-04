@@ -34,10 +34,11 @@ export class Drive extends GoogleApi {
     }
 
     async uploadDriveToFb(force=false) {
-        this.running = true;
         if (this.running) {
+            console.log("Already Running");
             return
         }
+        this.running = true;
         const drive = Drive.loadDrive();
         const response = await drive.listFiles();
         for (let i = 0; i < response.length; i++) {
