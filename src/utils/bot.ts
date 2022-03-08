@@ -17,14 +17,21 @@ config();
 
 export class Bot {
 
-    static ambassador: Bot = new Bot(process.env.AMBASSADOR_GUILD_ID);
-    static ecess: Bot = new Bot(process.env.ECESS_GUILD_ID);
+    static ambassador: Bot = new Bot(process.env.AMBASSADOR_GUILD_ID, {});
+    static ecess: Bot = new Bot(process.env.ECESS_GUILD_ID,
+        {
+        "ambassadors": {
+            "General": "901194834243633192",
+            "T2M": "936445460980322305"
+            }
+        });
     static client: Client | undefined = undefined;
     private readonly guild: Promise<Guild> | undefined;
-    private guild_id: string;
+    private readonly guild_id: string;
     private events: { call: undefined | Moment; data: undefined | any[] };
+    private readonly channels: any;
 
-    constructor(guild: string | undefined) {
+    constructor(guild: string | undefined, channels: Object) {
         const client = Bot.initClient();
         this.guild = guild ? client.guilds.fetch(guild): undefined;
         this.guild_id = guild || "";
@@ -32,6 +39,7 @@ export class Bot {
             call: undefined, 
             data: undefined
         }
+        this.channels = channels;
     }
 
     static initClient() {
@@ -67,31 +75,42 @@ export class Bot {
         }
     }
 
-    async getAnnouncements() {
+    async getAnnouncements(org: string) {
         if (Bot.client === undefined) {
             return [];
         }
         const response = [];
-        const channel : Channel | null = await Bot.client.channels.fetch("901194834243633192");
+
         if (!this.guild) {
             return [];
         }
         const guild = await this.guild;
-        if (! (channel instanceof NewsChannel)) {
-            return [];
+        const orgIds: any = this.channels[org] || {};
+        for (const [key, value] of Object.entries(orgIds)) {
+            if (!(typeof value === 'string')) {
+                continue;
+            }
+            const channel : Channel | null = await Bot.client.channels.fetch(value);
+            if (! (channel instanceof NewsChannel)) {
+                continue;
+            }
+            const messages = await channel.messages.fetch({limit: 100});
+            for (let k of messages) {
+                const m: Message = k[1];
+                const name = await guild.members.fetch(m.author.id);
+                response.push({
+                    author: name.displayName,
+                    content: await this.HTMLParser(m.content),
+                    date: m.editedAt || m.createdAt,
+                    label: -1 != ["Giselle", "Leigh Ann"].indexOf(name.displayName) ? "Advisor": (["Sara Hui", "Gabby Whitis"].indexOf(name.displayName) != -1 ? "Lord Ambassador": "Ambassador")
+                });
+            }
         }
-        const messages = await channel.messages.fetch({limit: 100});
-        for (let k of messages) {
-            const m: Message = k[1];
-            const name = await guild.members.fetch(m.author.id);
-            response.push({
-                author: name.displayName,
-                content: await this.HTMLParser(m.content),
-                date: m.editedAt || m.createdAt,
-                label: -1 != ["Giselle", "Leigh Ann"].indexOf(name.displayName) ? "Advisor": (["Sara Hui", "Gabby Whitis"].indexOf(name.displayName) != -1 ? "Lord Ambassador": "Ambassador")
-            });
-        }
-        return response;
+        return response.sort( (a: any, b: any) => {
+            const aDate = new Date(a);
+            const bDate = new Date(b);
+            return aDate.getTime() - bDate.getTime();
+        })
     }
 
     async HTMLParser(message: string): Promise<string> {

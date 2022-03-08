@@ -38,17 +38,12 @@ export function requestCalendar() {
 
     Api.setGetRoute("/bot/announcements/:org", async (req: Request, res: Response) => {
         const org = req.params.org;
-        if (org === "ambassadors") {
-            try {
-                const response = await Bot.ecess.getAnnouncements();
-                res.send(response);
-            }
-            catch (e) {
-                console.log(e);
-                res.sendStatus(400);
-            }
+        try {
+            const response = await Bot.ecess.getAnnouncements(org);
+            res.send(response);
         }
-        else {
+        catch (e) {
+            console.log(e);
             res.sendStatus(400);
         }
     });
