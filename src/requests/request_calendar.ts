@@ -40,7 +40,7 @@ export function requestCalendar() {
         const org = req.params.org;
         if (org === "ambassadors") {
             try {
-                const response = await Bot.ambassador.getAnnouncements();
+                const response = await Bot.ecess.getAnnouncements();
                 res.send(response);
             }
             catch (e) {
