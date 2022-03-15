@@ -45,10 +45,13 @@ const main = async () => {
                 userData = mapByName.get(item.name);
             }
         }
+        else {
+            userData = mapByName.get(item.name);
+        }
         if (userData) { // {id: user id} or {name: ... etc..}
             user = await auth.getUser(userData.id)
             await auth.updateUser(userData.id, {
-                email: item.email,
+                email: item.email || userData.email,
                 emailVerified: true
             })
         }
