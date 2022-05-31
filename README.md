@@ -9,14 +9,24 @@ This programs currently runs on Google Cloud!
 
 ### Running the Program
 
-Setting the environment variables
+Setting the environment variables: 
+/home/mwenclubhouse/environments/ecess-prod.env.list
 ```text
+ENV=[production if it is in production]
 DISCORD_TOKEN=[TOKEN FROM DISCORD] 
-DISCORD_ANNOUNCEMENT_CHANNEL=[ID OF CHANNEL WHERE BOT SHOULD READ FROM]
-AMBASSADOR_GUILD_ID=[ID OF THE AMBASSADOR SERVER]
-AMBASSADOR_ANNOUNCEMENT_CHANNEL=[ID OF THE AMBASSADOR ANNOUNCEMENTS]
 ECESS_GUILD_ID=[ID OF THE ECESS SERVER]
 GOOGLE_APPLICATION_CREDENTIALS=[LOCATION OF GOOGLE KEY FILE]
+GOOGLE_APPLICATION_JSON=[JSON of Firebase Admin, needed if GOOGLE_APPLICATION_CREDENTIALS is not used]
+```
+
+```bash
+$ sudo docker run -d  \
+--env-file /home/mwenclubhouse/environments/ecess-prod.env.list \
+-v /home/mwenclubhouse/ecess:/usr/src/app/bucket \
+--name ecess \
+--restart always \
+-p 3000:8000 \
+ghcr.io/purdue-ecess/ecess-api:main"
 ```
 
 Local Development
