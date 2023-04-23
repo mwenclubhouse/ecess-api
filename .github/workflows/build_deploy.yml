@@ -57,14 +57,14 @@ jobs:
       - name: 'Use GCP CLI'
         run: |
           gcloud compute ssh mwenclubhouse --zone us-central1-a --command "\
-          sudo docker system prune -f -a ; \
           sudo docker pull ghcr.io/purdue-ecess/ecess-api:main ; \
-          sudo docker stop ecess ; \
-          sudo docker container rm ecess ; \
+          sudo docker stop ecess-api ; \
+          sudo docker container rm ecess-api ; \
           sudo docker run -d --env-file /home/mwenclubhouse/environments/ecess-prod.env.list \
             -v /home/mwenclubhouse/ecess:/usr/src/app/bucket \
-            --name ecess \
+            --name ecess-api \
             --restart always \
-            -p 3000:8000 \
-            ghcr.io/purdue-ecess/ecess-api:main"
+            -p 8008:8000 \
+            ghcr.io/purdue-ecess/ecess-api:main ; \
+          sudo docker system prune -f -a"
           gcloud compute os-login ssh-keys remove --key-file=/home/runner/.ssh/google_compute_engine.pub
