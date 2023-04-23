@@ -23,7 +23,7 @@ export class MyFbStorage extends MyFirebase {
     private constructor() {
         super();
         this.storage = getStorage(MyFirebase.app);
-        this.bucket = this.storage.bucket("gs://purdue-ecess.appspot.com");
+        this.bucket = this.storage.bucket("gs://mwenclubhouse.appspot.com");
     }
 
     async listDir(prefix: string) {
